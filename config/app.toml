@@ -19,3 +19,7 @@
     uri = "mongodb://127.0.0.1:27018"
     database = "due"
     collection = "players"
+
+[tables]
+    # Luban 导出的静态业务数据，修改 Excel 后导出并重启 logic 生效。
+    dir = "config/generated"

@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package due.protocol;
+option go_package = "due-server/internal/common/protocol;protocol";
+
+// Field numbers are permanent wire contracts. Append fields; never reuse numbers.
+
+message Player {
+  int64 UID = 1 [json_name = "uid"];
+  string nickname = 2 [json_name = "nickname"];
+  int32 level = 3 [json_name = "level"];
+  int64 exp = 4 [json_name = "exp"];
+  int64 gold = 5 [json_name = "gold"];
+}
+
+message LoginReq {
+  int64 UID = 1 [json_name = "uid"];
+  string token = 2 [json_name = "token"];
+}
+
+message LoginRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  Player player = 3 [json_name = "player"];
+  string node = 4 [json_name = "node"];
+}
+
+message PingReq {
+  string message = 1 [json_name = "message"];
+}
+
+message PingRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  string server_time = 3 [json_name = "serverTime"];
+  string node = 4 [json_name = "node"];
+}
+
+message PlayerDataReq {
+}
+
+message PlayerDataRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  Player player = 3 [json_name = "player"];
+  string node = 4 [json_name = "node"];
+}
+
+message AddExpReq {
+  int64 delta = 1 [json_name = "delta"];
+}
+
+message AddExpRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  Player player = 3 [json_name = "player"];
+  string node = 4 [json_name = "node"];
+}
+
+message AddGoldReq {
+  int64 delta = 1 [json_name = "delta"];
+}
+
+message AddGoldRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  Player player = 3 [json_name = "player"];
+  string node = 4 [json_name = "node"];
+}
+
+message EnterBattleReq {
+  string mode = 1 [json_name = "mode"];
+}
+
+message EnterBattleRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  string RoomID = 3 [json_name = "roomId"];
+  int64 UID = 4 [json_name = "uid"];
+  string node = 5 [json_name = "node"];
+}
+
+message AttackReq {
+  string skill = 1 [json_name = "skill"];
+}
+
+message AttackRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  string RoomID = 3 [json_name = "roomId"];
+  int32 hits = 4 [json_name = "hits"];
+  string node = 5 [json_name = "node"];
+}
+
+message LeaveBattleReq {
+}
+
+message LeaveBattleRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+  string RoomID = 3 [json_name = "roomId"];
+  string node = 4 [json_name = "node"];
+}
+
+message ErrorRes {
+  int32 code = 1 [json_name = "code"];
+  string message = 2 [json_name = "message"];
+}

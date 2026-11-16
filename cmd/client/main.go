@@ -90,7 +90,7 @@ func (d *demo) onLogin(ctx *client.Context) {
 		log.Errorf("parse login response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("login failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -108,7 +108,7 @@ func (d *demo) onPlayerData(ctx *client.Context) {
 		log.Errorf("parse player data response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("player data failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -133,7 +133,7 @@ func (d *demo) onAddExp(ctx *client.Context) {
 		log.Errorf("parse add exp response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("add exp failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -150,7 +150,7 @@ func (d *demo) onAddGold(ctx *client.Context) {
 		log.Errorf("parse add gold response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("add gold failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -168,7 +168,7 @@ func (d *demo) onEnterBattle(ctx *client.Context) {
 		log.Errorf("parse enter battle response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("enter battle failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -186,7 +186,7 @@ func (d *demo) onAttack(ctx *client.Context) {
 		log.Errorf("parse attack response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("attack failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -209,7 +209,7 @@ func (d *demo) onLeaveBattle(ctx *client.Context) {
 		log.Errorf("parse leave battle response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("leave battle failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}
@@ -226,7 +226,7 @@ func (d *demo) onPing(ctx *client.Context) {
 		log.Errorf("parse ping response failed: %v", err)
 		return
 	}
-	if res.Code != codes.OK.Code() {
+	if res.Code != int32(codes.OK.Code()) {
 		log.Errorf("ping failed, code: %d, message: %s", res.Code, res.Message)
 		return
 	}

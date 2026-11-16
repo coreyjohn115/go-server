@@ -20,6 +20,7 @@ import (
 	"github.com/dobyte/due/v2/codes"
 	"github.com/dobyte/due/v2/log"
 
+	"due-server/internal/common/gamedata"
 	"due-server/internal/common/protocol"
 	"due-server/internal/logic/store/playerstore"
 )
@@ -46,6 +47,7 @@ type saveTimer interface{ Stop() bool }
 // Processor 是玩家 Actor 的业务处理器，实现 node.Processor。
 type Processor struct {
 	actor        *node.Actor
+	tables       *gamedata.Tables
 	store        playerStore
 	data         *playerstore.Player
 	dirty        bool
@@ -57,8 +59,8 @@ type Processor struct {
 }
 
 // New 创建玩家 Actor 的业务处理器。
-func New(actor *node.Actor, store *playerstore.Store, data *playerstore.Player) *Processor {
-	return &Processor{actor: actor, store: store, data: data, savedVersion: data.Version,
+func New(actor *node.Actor, store *playerstore.Store, data *playerstore.Player, tables *gamedata.Tables) *Processor {
+	return &Processor{actor: actor, store: store, data: data, tables: tables, savedVersion: data.Version,
 		schedule: func(d time.Duration, f func()) (saveTimer, error) { return actor.AfterInvoke(d, f) },
 	}
 }
@@ -86,7 +88,7 @@ func (a *Processor) Destroy() {
 
 // handlePlayerData 返回玩家内存中的最新数据。
 func (a *Processor) handlePlayerData(ctx node.Context) {
-	res := &protocol.PlayerDataRes{Code: codes.InternalError.Code()}
+	res := &protocol.PlayerDataRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -94,7 +96,7 @@ func (a *Processor) handlePlayerData(ctx node.Context) {
 		}
 	}()
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Player = a.snapshot()
 	res.Node = ctx.Proxy().GetID()
 }
@@ -102,7 +104,7 @@ func (a *Processor) handlePlayerData(ctx node.Context) {
 // handleAddExp 增加经验，经验达到阈值时自动升级。
 func (a *Processor) handleAddExp(ctx node.Context) {
 	req := &protocol.AddExpReq{}
-	res := &protocol.AddExpRes{Code: codes.InternalError.Code()}
+	res := &protocol.AddExpRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -112,7 +114,7 @@ func (a *Processor) handleAddExp(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse add exp request failed: %v", err)
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		return
 	}
 	if a.conflict {
@@ -120,7 +122,7 @@ func (a *Processor) handleAddExp(ctx node.Context) {
 		return
 	}
 	if req.Delta <= 0 || req.Delta > maxDelta || a.data.Exp > math.MaxInt64-req.Delta || a.data.Level <= 0 || a.data.Level >= math.MaxInt32 || a.data.Version == math.MaxInt64 {
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		res.Message = "invalid delta or player value limit reached"
 		return
 	}
@@ -131,7 +133,7 @@ func (a *Processor) handleAddExp(ctx node.Context) {
 	log.Infof("player exp updated, uid: %d, delta: %d, level: %d, exp: %d",
 		a.data.UID, req.Delta, a.data.Level, a.data.Exp)
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Message = "add exp ok"
 	res.Player = a.snapshot()
 	res.Node = ctx.Proxy().GetID()
@@ -140,7 +142,7 @@ func (a *Processor) handleAddExp(ctx node.Context) {
 // handleAddGold 增加金币。
 func (a *Processor) handleAddGold(ctx node.Context) {
 	req := &protocol.AddGoldReq{}
-	res := &protocol.AddGoldRes{Code: codes.InternalError.Code()}
+	res := &protocol.AddGoldRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -150,7 +152,7 @@ func (a *Processor) handleAddGold(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse add gold request failed: %v", err)
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		return
 	}
 	if a.conflict {
@@ -158,7 +160,7 @@ func (a *Processor) handleAddGold(ctx node.Context) {
 		return
 	}
 	if req.Delta <= 0 || req.Delta > maxDelta || a.data.Gold > math.MaxInt64-req.Delta || a.data.Version == math.MaxInt64 {
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		res.Message = "invalid delta or player value limit reached"
 		return
 	}
@@ -168,7 +170,7 @@ func (a *Processor) handleAddGold(ctx node.Context) {
 
 	log.Infof("player gold updated, uid: %d, delta: %d, gold: %d", a.data.UID, req.Delta, a.data.Gold)
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Message = "add gold ok"
 	res.Player = a.snapshot()
 	res.Node = ctx.Proxy().GetID()
@@ -178,8 +180,19 @@ func (a *Processor) handleAddGold(ctx node.Context) {
 func (a *Processor) gainExp(delta int64) {
 	a.data.Exp += delta
 
-	for a.data.Level < math.MaxInt32 && a.data.Exp >= int64(a.data.Level)*expPerLevel {
-		a.data.Exp -= int64(a.data.Level) * expPerLevel
+	for a.data.Level < math.MaxInt32 {
+		required := int64(a.data.Level) * expPerLevel
+		if a.tables != nil {
+			row := a.tables.TbPlayerLevel.Get(a.data.Level)
+			if row == nil {
+				break
+			} // Beyond the exported table, retain experience without levelling.
+			required = row.Exp
+		}
+		if required <= 0 || a.data.Exp < required {
+			break
+		}
+		a.data.Exp -= required
 		a.data.Level++
 	}
 }

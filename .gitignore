@@ -1,8 +1,10 @@
 # 构建产物
+/.codex-work/
 /bin/
 *.exe
 *.test
 *.out
+.codex-work/
 
 # 运行时生成
 /run/

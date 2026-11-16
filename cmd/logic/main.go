@@ -17,6 +17,7 @@ import (
 
 	"due-server/internal/common/backendapi"
 	"due-server/internal/common/bootstrap"
+	"due-server/internal/common/gamedata"
 	"due-server/internal/logic/app"
 	logichandler "due-server/internal/logic/handler"
 	"due-server/internal/logic/store/playerstore"
@@ -25,6 +26,10 @@ import (
 func main() {
 	// 初始化业务配置中心（./config）
 	bootstrap.Init()
+	tables, err := gamedata.Load(config.Get("app.tables.dir", "config/generated").String())
+	if err != nil {
+		log.Fatalf("load game tables failed: %v", err)
+	}
 
 	// backend 是独立的无状态 HTTP 服务，登录校验通过它完成
 	backend := backendapi.NewClient(
@@ -51,7 +56,7 @@ func main() {
 		node.WithRegistry(bootstrap.Registry()),
 	)
 
-	app.RegisterLogic(component.Proxy(), logichandler.New(backend, store))
+	app.RegisterLogic(component.Proxy(), logichandler.New(backend, store, tables))
 
 	container.Add(component)
 	container.Serve()

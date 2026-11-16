@@ -3,8 +3,26 @@ package playeractor
 import (
 	"testing"
 
+	"due-server/internal/common/gamedata"
 	"due-server/internal/logic/store/playerstore"
 )
+
+func TestGainExpUsesExportedTable(t *testing.T) {
+	tables, err := gamedata.Load("../../../../config/generated")
+	if err != nil {
+		t.Fatal(err)
+	}
+	a := &Processor{tables: tables, data: &playerstore.Player{Level: 1}}
+	a.gainExp(300)
+	if a.data.Level != 3 || a.data.Exp != 0 {
+		t.Fatalf("unexpected level/exp: %d/%d", a.data.Level, a.data.Exp)
+	}
+	a.data.Level, a.data.Exp = 101, 0
+	a.gainExp(100000)
+	if a.data.Level != 101 || a.data.Exp != 100000 {
+		t.Fatal("missing table entry must retain experience")
+	}
+}
 
 func TestGainExp(t *testing.T) {
 	tests := []struct {

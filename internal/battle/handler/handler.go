@@ -40,7 +40,7 @@ func New() *Battle {
 // Enter 进入战斗：把 UID 绑定到当前 battle 实例，并创建（或复用）房间。
 func (h *Battle) Enter(ctx node.Context) {
 	req := &protocol.EnterBattleReq{}
-	res := &protocol.EnterBattleRes{Code: codes.InternalError.Code()}
+	res := &protocol.EnterBattleRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -50,13 +50,13 @@ func (h *Battle) Enter(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse enter battle request failed: %v", err)
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		return
 	}
 
 	uid := ctx.UID()
 	if uid <= 0 {
-		res.Code = codes.Unauthorized.Code()
+		res.Code = int32(codes.Unauthorized.Code())
 		return
 	}
 
@@ -81,7 +81,7 @@ func (h *Battle) Enter(ctx node.Context) {
 
 	log.Infof("user entered battle, uid: %d, room: %s, node: %s", uid, room.ID, ctx.Proxy().GetID())
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Message = "enter battle ok"
 	res.RoomID = room.ID
 	res.UID = uid
@@ -91,7 +91,7 @@ func (h *Battle) Enter(ctx node.Context) {
 // Attack 发起攻击：有状态路由，房间状态只在本实例内存中。
 func (h *Battle) Attack(ctx node.Context) {
 	req := &protocol.AttackReq{}
-	res := &protocol.AttackRes{Code: codes.InternalError.Code()}
+	res := &protocol.AttackRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -101,7 +101,7 @@ func (h *Battle) Attack(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse attack request failed: %v", err)
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		return
 	}
 
@@ -111,20 +111,20 @@ func (h *Battle) Attack(ctx node.Context) {
 	room, ok := h.rooms[uid]
 	if ok {
 		room.Hits++
-		res.Hits = room.Hits
+		res.Hits = int32(room.Hits)
 		res.RoomID = room.ID
 	}
 	h.mu.Unlock()
 
 	if !ok {
-		res.Code = codes.NotFound.Code()
+		res.Code = int32(codes.NotFound.Code())
 		res.Message = "player is not in battle"
 		return
 	}
 
 	log.Infof("attack handled, uid: %d, skill: %s, hits: %d, node: %s", uid, req.Skill, res.Hits, ctx.Proxy().GetID())
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Message = "attack ok"
 	res.Node = ctx.Proxy().GetID()
 }
@@ -132,7 +132,7 @@ func (h *Battle) Attack(ctx node.Context) {
 // Leave 离开战斗：有状态路由，清理房间并解除 battle 绑定。
 func (h *Battle) Leave(ctx node.Context) {
 	req := &protocol.LeaveBattleReq{}
-	res := &protocol.LeaveBattleRes{Code: codes.InternalError.Code()}
+	res := &protocol.LeaveBattleRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -142,7 +142,7 @@ func (h *Battle) Leave(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse leave battle request failed: %v", err)
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		return
 	}
 
@@ -167,7 +167,7 @@ func (h *Battle) Leave(ctx node.Context) {
 		log.Infof("user left battle, uid: %d, room: %s", uid, res.RoomID)
 	}
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Message = "leave battle ok"
 	res.Node = ctx.Proxy().GetID()
 }

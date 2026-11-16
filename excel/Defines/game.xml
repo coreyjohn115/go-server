@@ -1,0 +1,13 @@
+<module name="">
+  <bean name="PlayerLevel">
+    <var name="level" type="int" />
+    <var name="exp" type="long" />
+  </bean>
+  <table name="TbPlayerLevel" value="PlayerLevel" input="player_level.xlsx" index="level" group="s" />
+  <bean name="Item">
+    <var name="id" type="int" />
+    <var name="name" type="string" />
+    <var name="maxStack" type="int" />
+  </bean>
+  <table name="TbItem" value="Item" input="item.xlsx" index="id" group="s" />
+</module>

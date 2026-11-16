@@ -5,7 +5,8 @@
 - 框架：`github.com/dobyte/due/v2 v2.6.7`（子模块固定在同一发布提交）
 - Go：`go 1.27.0`（Go 1.21+ 会自动下载所需 toolchain）
 - 传输：TCP（可换成 ws / kcp / quic）
-- 编解码：JSON
+- TCP 编解码：Protobuf（backend HTTP 仍为 JSON）
+- 静态业务配置：Luban 5.1.0 + Excel，生成 Go 类型与 JSON 数据
 - 玩家数据：MongoDB + 每个玩家一个 Actor
 
 ## 进程与职责
@@ -160,9 +161,20 @@ due/
 ├── etc/etc.toml                  # 框架启动配置
 ├── config/app.toml               # 业务配置（token、backend 地址、mongo）
 ├── docker-compose.yaml           # etcd + redis + mongo
+├── doc/                          # 功能文档（新增功能必须同步补充）
+│   ├── README.md                 # 文档索引与规范
+│   └── features/                 # 一个功能一个文件（模板 _template.md）
+├── .agents/skills/feature-docs/  # 项目 skill（跨 agent 通用目录）：功能文档规范
 ├── start.bat                     # Windows 一键启动服务器
 └── README.md
 ```
+
+## 功能文档
+
+- 文档索引与规范：[doc/README.md](doc/README.md)
+- 新增或修改功能时，必须在 `doc/features/<feature>.md` 新增/更新功能文档，并更新索引；
+- 具体规则与完成前检查清单见项目 skill [feature-docs](.agents/skills/feature-docs/SKILL.md)；
+- 新功能从 `doc/features/_template.md` 复制开始。
 
 ## 快速开始
 
@@ -269,7 +281,14 @@ INFO add gold +100: uid=1001 nickname=player-1001 level=2 exp=0 gold=200, logic 
 要点：
 
 - `logic` / `battle` 共用 etc，节点名由 `node.WithName("logic")` / `node.WithName("battle")` 指定。
-- gate、logic、battle、client 的 `packet` 参数与 `codec` 必须完全一致。
+- gate、logic、battle、client 的 `packet` 参数必须完全一致；node/client 的 `codec` 使用 `proto`。
+
+## 协议和配置生成
+
+根目录执行 `gen.bat` 生成全部；`proto\gen.bat` 生成 Protobuf；`Excel\gen.bat` 使用 Luban 导表。
+源文件在 `proto/message.proto`、`Excel/Data/*.xlsx` 和 `Excel/Defines/game.xml`。
+生成代码及 `config/generated` 数据需随项目提交、部署。首次需要联网准备工具，后续复用本地缓存。
+详细步骤见 [协议与配置生成](doc/features/code-generation.md)。此版本 TCP 协议不再兼容旧 JSON 客户端。
 - 多进程共用 `etc.toml` 时不要配置 `pid`。
 
 ## 生产建议

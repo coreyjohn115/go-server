@@ -43,7 +43,7 @@ shutdownMaxWaitTime = "30s"
     # 实例名称由各进程通过 node.WithName 指定：logic / battle。
     # 名称同时是服务组名，有状态路由按「UID + 服务组」定位实例。
     # 节点与网关之间的编解码器：json | proto
-    codec = "json"
+    codec = "proto"
     weight = 1
     addr = ":0"
     expose = false
@@ -62,7 +62,7 @@ shutdownMaxWaitTime = "30s"
 # 调试客户端（cmd/client）
 [cluster.client]
     name = "client"
-    codec = "json"
+    codec = "proto"
 
 # ============================== 网络 ==============================
 

@@ -16,6 +16,7 @@ import (
 	"github.com/dobyte/due/v2/utils/xtime"
 
 	"due-server/internal/common/backendapi"
+	"due-server/internal/common/gamedata"
 	"due-server/internal/common/protocol"
 	"due-server/internal/logic/actor/player"
 	"due-server/internal/logic/store/playerstore"
@@ -25,11 +26,12 @@ import (
 type Logic struct {
 	backend *backendapi.Client
 	store   *playerstore.Store
+	tables  *gamedata.Tables
 }
 
 // New 创建 logic 处理器。
-func New(backend *backendapi.Client, store *playerstore.Store) *Logic {
-	return &Logic{backend: backend, store: store}
+func New(backend *backendapi.Client, store *playerstore.Store, tables *gamedata.Tables) *Logic {
+	return &Logic{backend: backend, store: store, tables: tables}
 }
 
 // Login 处理登录请求：backend 校验令牌 -> MongoDB 加载玩家 -> 绑定 UID -> 创建玩家 Actor。
@@ -38,7 +40,7 @@ func (h *Logic) Login(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse login request failed: %v", err)
-		h.response(ctx, &protocol.LoginRes{Code: codes.InvalidArgument.Code()})
+		h.response(ctx, &protocol.LoginRes{Code: int32(codes.InvalidArgument.Code())})
 		return
 	}
 
@@ -47,7 +49,7 @@ func (h *Logic) Login(ctx node.Context) {
 	// 登录包含 HTTP 调用与数据库读取，交给任务池执行，避免占用节点执行域。
 	// Task 会接管 ctx 的所有权，因此回包必须写在任务内部，外层 handler 立即返回。
 	ctx.Task(func(ctx node.Context) {
-		res := &protocol.LoginRes{Code: codes.InternalError.Code()}
+		res := &protocol.LoginRes{Code: int32(codes.InternalError.Code())}
 
 		defer func() {
 			if err := ctx.Response(res); err != nil {
@@ -56,7 +58,7 @@ func (h *Logic) Login(ctx node.Context) {
 		}()
 
 		if uid <= 0 {
-			res.Code = codes.InvalidArgument.Code()
+			res.Code = int32(codes.InvalidArgument.Code())
 			return
 		}
 
@@ -67,7 +69,7 @@ func (h *Logic) Login(ctx node.Context) {
 		}
 		if !data.OK {
 			log.Warnf("login rejected, uid: %d", uid)
-			res.Code = codes.Unauthorized.Code()
+			res.Code = int32(codes.Unauthorized.Code())
 			res.Message = "invalid token"
 			return
 		}
@@ -97,7 +99,7 @@ func (h *Logic) Login(ctx node.Context) {
 
 		log.Infof("user logged in, uid: %d, cid: %d, node: %s", uid, ctx.CID(), ctx.Proxy().GetID())
 
-		res.Code = codes.OK.Code()
+		res.Code = int32(codes.OK.Code())
 		res.Message = "login ok"
 		res.Player = snap
 		res.Node = ctx.Proxy().GetID()
@@ -113,7 +115,7 @@ func (h *Logic) NextToActor(ctx node.Context) {
 		log.Errorf("dispatch to player actor failed, uid: %d, route: %d, err: %v", ctx.UID(), ctx.Route(), err)
 
 		code := codes.Convert(err)
-		if e := ctx.Response(&protocol.ErrorRes{Code: code.Code(), Message: code.Message()}); e != nil {
+		if e := ctx.Response(&protocol.ErrorRes{Code: int32(code.Code()), Message: code.Message()}); e != nil {
 			log.Errorf("response dispatch error failed: %v", e)
 		}
 	}
@@ -122,7 +124,7 @@ func (h *Logic) NextToActor(ctx node.Context) {
 // Ping 处理连通性测试请求。
 func (h *Logic) Ping(ctx node.Context) {
 	req := &protocol.PingReq{}
-	res := &protocol.PingRes{Code: codes.InternalError.Code()}
+	res := &protocol.PingRes{Code: int32(codes.InternalError.Code())}
 
 	defer func() {
 		if err := ctx.Response(res); err != nil {
@@ -132,11 +134,11 @@ func (h *Logic) Ping(ctx node.Context) {
 
 	if err := ctx.Parse(req); err != nil {
 		log.Errorf("parse ping request failed: %v", err)
-		res.Code = codes.InvalidArgument.Code()
+		res.Code = int32(codes.InvalidArgument.Code())
 		return
 	}
 
-	res.Code = codes.OK.Code()
+	res.Code = int32(codes.OK.Code())
 	res.Message = "pong: " + req.Message
 	res.ServerTime = xtime.Now().Format(xtime.DateTime)
 	res.Node = ctx.Proxy().GetID()
@@ -176,7 +178,7 @@ func (h *Logic) ensureActor(ctx node.Context, uid int64, nickname string) (*node
 		}
 
 		actor, err = proxy.Spawn(func(actor *node.Actor, _ ...any) node.Processor {
-			return playeractor.New(actor, h.store, data)
+			return playeractor.New(actor, h.store, data, h.tables)
 		}, node.WithActorKind(playeractor.Kind), node.WithActorID(id))
 		if err != nil {
 			// 并发登录时可能已被创建，回读一次

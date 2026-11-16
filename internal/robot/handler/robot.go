@@ -34,7 +34,7 @@ func (o Options) Validate() error {
 }
 
 type reply struct {
-	Code    int              `json:"code"`
+	Code    int32            `json:"code"`
 	Message string           `json:"message"`
 	Player  *protocol.Player `json:"player"`
 	Node    string           `json:"node"`
@@ -53,7 +53,20 @@ func (r *Runner) Register(proxy *client.Proxy) {
 	for _, route := range []int32{protocol.RouteLogin, protocol.RoutePlayerData, protocol.RoutePing} {
 		proxy.AddRouteHandler(route, func(ctx *client.Context) {
 			res := reply{route: ctx.Route()}
-			res.err = ctx.Parse(&res)
+			switch ctx.Route() {
+			case protocol.RouteLogin:
+				msg := &protocol.LoginRes{}
+				res.err = ctx.Parse(msg)
+				res.Code, res.Message, res.Player, res.Node = msg.Code, msg.Message, msg.Player, msg.Node
+			case protocol.RoutePlayerData:
+				msg := &protocol.PlayerDataRes{}
+				res.err = ctx.Parse(msg)
+				res.Code, res.Message, res.Player, res.Node = msg.Code, msg.Message, msg.Player, msg.Node
+			case protocol.RoutePing:
+				msg := &protocol.PingRes{}
+				res.err = ctx.Parse(msg)
+				res.Code, res.Message, res.Node = msg.Code, msg.Message, msg.Node
+			}
 			deliver(ctx.Conn(), res)
 		})
 	}
@@ -133,7 +146,7 @@ func (r *Runner) check(parent context.Context, proxy *client.Proxy, uid int64) e
 			if res.err != nil {
 				return res.err
 			}
-			if res.route != step.route || res.Code != codes.OK.Code() {
+			if res.route != step.route || res.Code != int32(codes.OK.Code()) {
 				return fmt.Errorf("expected route %d, got route=%d code=%d message=%s", step.route, res.route, res.Code, res.Message)
 			}
 			if step.route != protocol.RoutePing && (res.Player == nil || res.Player.UID != uid) {

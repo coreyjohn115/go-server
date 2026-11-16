@@ -5,7 +5,7 @@
 - 临时目录固定为 `.codex-work/<task>/`（脚本、检查结果、临时产物）；不要建 `outputs/` 等其它临时目录。
 - **`node_modules` 只允许出现在 `.codex-work/node_modules`（公用）**。判断依赖 / `npm install` 前先检查此处；**禁止**在 `.codex-work/<task>/` 或其它子目录再装一份。
 - 最终文件放入对应项目目录（如协议改动 → `internal/common/protocol/`，业务 handler → `internal/{logic,battle}/handler/`）。
-- 任务结束：删临时文件；目录空了一并删掉，勿留空壳。
+- 任务结束只清理**本任务自己的**目录：删除 `.codex-work/<task>/`；**禁止删除 `.codex-work` 根目录**，也不要删除或改动其他任务目录及共享目录（`node_modules`、`tools`、`tool-download` 等）。
 
 ## 命令执行偏好
 
@@ -78,6 +78,7 @@ go build ./...
 - **中间件版本**：定位器需要 **Redis 6+**（`SET ... KEEPTTL`）；etcd / redis 通过 `docker compose` 启动。backend 可不依赖中间件单独运行。
 - **模块路径**：Go module 名为 `due-server`；新增包 import 前缀保持 `due-server/internal/...`。
 - **不要回滚与任务无关的本地改动**。
+- **Git 提交说明使用中文**：提交标题与正文均使用中文，技术名称、代码标识符及必要的类型前缀（如 `feat`、`fix`）可保留英文。
 - **不要提交密钥**：`.env`、生产 token、真实账号配置等勿入库；示例 token 仅限本地开发。
 
 ## 扩展业务速查

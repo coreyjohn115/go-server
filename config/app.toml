@@ -1,0 +1,21 @@
+# ============================================================================
+# 业务配置（file 配置中心）
+#
+# key 规则为「文件名.表名.字段名」，例如 app.app.token、app.mongo.uri。
+# 支持 json / yaml / toml / xml，可按环境拆分成多个文件放在本目录下。
+# ============================================================================
+
+[app]
+    name = "due-server"
+    # 登录令牌。生产环境请替换为真实的账号/鉴权服务
+    token = "dev-token"
+
+[backend]
+    # backend 后台服务地址（logic 通过 HTTP 调用它校验登录）
+    base_url = "http://127.0.0.1:8080"
+
+[mongo]
+    # Docker MongoDB（宿主机映射端口 27018）
+    uri = "mongodb://127.0.0.1:27018"
+    database = "due"
+    collection = "players"

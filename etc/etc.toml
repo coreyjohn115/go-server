@@ -1,0 +1,153 @@
+# ============================================================================
+# 框架启动配置（etc）
+#
+# 该文件由 due 的 etc 模块在进程启动时读取，只放框架与组件的启动参数；
+# 需要热更新的业务配置请放到 ./config 目录（见 config/app.toml）。
+# 配置目录优先级：--etc > DUE_ETC 环境变量 > ./etc
+#
+# 注意：gate 与 node 共用同一份配置，但进程内 PID 文件会互相覆盖，
+# 所以这里不配置 pid；需要时可为每个进程准备独立的 etc 目录：
+#   DUE_ETC=./etc/gate go run ./cmd/gate
+# ============================================================================
+
+# 运行模式：debug | test | pre-release | release
+mode = "debug"
+# 时区。业务代码取时间请使用 xtime.Now()
+timezone = "Local"
+# 容器关闭时等待各组件 Close 完成的最长时间
+shutdownMaxWaitTime = "30s"
+
+# ============================== 集群 ==============================
+
+# 网关实例
+[cluster.gate]
+    name = "gate"
+    # 内建 RPC 监听地址，:0 表示随机端口
+    addr = ":0"
+    expose = false
+    # 无状态路由的分发策略：random | rr | wrr
+    dispatch = "wrr"
+
+    # 网关到节点的内建 RPC 连接
+    [cluster.gate.linker]
+        connNum = 5
+        callTimeout = "3s"
+        dialTimeout = "3s"
+        dialRetryTimes = 3
+        faultRecoveryTime = "5s"
+        commandQueueSize = 4096
+        commandWriteTimeout = "0s"
+
+# 节点实例
+[cluster.node]
+    # 实例名称由各进程通过 node.WithName 指定：logic / battle。
+    # 名称同时是服务组名，有状态路由按「UID + 服务组」定位实例。
+    # 节点与网关之间的编解码器：json | proto
+    codec = "json"
+    weight = 1
+    addr = ":0"
+    expose = false
+    taskQueueSize = 4096
+    messageQueueSize = 10240
+
+    [cluster.node.linker]
+        connNum = 5
+        callTimeout = "3s"
+        dialTimeout = "3s"
+        dialRetryTimes = 3
+        faultRecoveryTime = "5s"
+        commandQueueSize = 4096
+        commandWriteTimeout = "0s"
+
+# 调试客户端（cmd/client）
+[cluster.client]
+    name = "client"
+    codec = "json"
+
+# ============================== 网络 ==============================
+
+# 网关对客户端暴露的 TCP 服务
+[network.tcp.server]
+    addr = ":3553"
+    maxConnNum = 5000
+    readBufferSize = 4096
+    writeQueueSize = 1024
+    writeTimeout = "0s"
+    heartbeatInterval = "10s"
+    heartbeatMechanism = "resp"
+    # 建连后未绑定用户即断开的时限，0 表示不校验
+    authorizeTimeout = "0s"
+    closeTimeout = "0s"
+
+# 客户端拨号配置
+[network.tcp.client]
+    addr = "127.0.0.1:3553"
+    dialTimeout = "3s"
+    heartbeatInterval = "10s"
+    closeTimeout = "0s"
+
+# ========================== HTTP 后台服务 ==========================
+# backend 是独立部署的无状态服务，不注册到集群
+
+[http]
+    name = "backend"
+    addr = ":8080"
+    console = false
+    bodyLimit = "1M"
+
+    [http.swagger]
+        enable = false
+
+# ============================ 注册中心 ============================
+
+[registry.etcd]
+    addrs = ["127.0.0.1:2379"]
+    dialTimeout = "5s"
+    namespace = "services"
+    leaseTTL = "15s"
+
+# ============================== 定位器 ============================
+
+[locate.redis]
+    addrs = ["127.0.0.1:6379"]
+    db = 0
+    maxRetries = 3
+    prefix = "due:locate"
+
+# ============================== 打包器 ==============================
+# 客户端、网关、节点必须使用完全一致的打包参数
+
+[packet]
+    byteOrder = "big"
+    routeBytes = 2
+    seqBytes = 2
+    bufferBytes = 5000
+    heartbeatTime = false
+
+# ================================ 日志 ================================
+
+[log]
+    level = "debug"
+    stackLevel = "error"
+    timeFormat = "2006/01/02 15:04:05.000000"
+    callSkip = 2
+    callFullPath = true
+
+[log.terminals]
+    console = ["debug", "info", "warn", "error", "fatal", "panic"]
+
+[log.console]
+    format = "text"
+
+# 需要落盘时打开下面的文件终端
+# [log.terminals]
+#     console = ["debug", "info", "warn", "error", "fatal", "panic"]
+#     file = ["info", "warn", "error", "fatal", "panic"]
+#
+# [log.file]
+#     path = "./log/due.log"
+#     format = "text"
+#     maxAge = "7d"
+#     maxSize = "100M"
+#     rotate = "day"
+#     compress = false

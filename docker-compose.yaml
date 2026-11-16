@@ -1,0 +1,42 @@
+services:
+  # 服务注册中心：gate / logic / battle 通过它互相发现
+  etcd:
+    image: gcr.io/etcd-development/etcd:v3.6.4
+    container_name: due-etcd
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd0
+      - --data-dir=/etcd-data
+      - --advertise-client-urls=http://0.0.0.0:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+    ports:
+      - "2379:2379"
+    volumes:
+      - etcd-data:/etcd-data
+
+  # 用户定位器：记录 UID 所在的网关与节点
+  # 必须使用 Redis 6+（due 定位器使用 SET ... KEEPTTL）
+  redis:
+    image: redis:7-alpine
+    container_name: due-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  # 玩家数据存储（logic 节点使用）
+  # 宿主机使用 27018，允许与本机 MongoDB（27017）同时运行
+  mongo:
+    image: mongo:7
+    container_name: due-mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  etcd-data:
+  redis-data:
+  mongo-data:

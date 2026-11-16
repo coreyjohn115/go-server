@@ -1,0 +1,20 @@
+# 构建产物
+/bin/
+*.exe
+*.test
+*.out
+
+# 运行时生成
+/run/
+log/
+/tmp/
+
+# 本地覆盖配置
+/etc/*.local.toml
+/config/*.local.*
+
+# IDE / 系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

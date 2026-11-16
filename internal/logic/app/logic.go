@@ -25,6 +25,9 @@ func RegisterLogic(proxy *node.Proxy, h *handler.Logic) {
 		node.RouteOptions{Stateful: true, Authorized: true})
 	proxy.Router().AddRouteHandler(protocol.RouteAddGold, h.NextToActor,
 		node.RouteOptions{Stateful: true, Authorized: true})
+	for _, route := range []int32{protocol.RouteItemList, protocol.RouteUseItem, protocol.RouteDeleteItem, protocol.RouteTaskList, protocol.RouteCommitTask} {
+		proxy.Router().AddRouteHandler(route, h.NextToActor, node.RouteOptions{Stateful: true, Authorized: true})
+	}
 
 	// 连接事件：上线创建 Actor，下线销毁 Actor（销毁时同步落库）
 	proxy.AddEventHandler(cluster.Connect, h.OnConnect)

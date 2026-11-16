@@ -21,7 +21,7 @@ backend HTTP 仍使用 JSON，路径与契约不变。
 
 Excel 源数据在 `Excel/Data`，定义在 `Excel/Defines`；生成类型在 `internal/common/gamedata`，
 运行数据在 `config/generated`。logic 在启动时完整加载并校验，作为只读快照传给玩家 Processor。
-升级优先使用等级表，超出配置范围停止升级并保留经验。MongoDB、Redis 结构未改变。
+升级优先使用等级表，超出配置范围停止升级并保留经验。道具、效果、初始发放和任务表分别为 item、item_rule、init_item、task；启动时验证引用及任务链。MongoDB 扩展见[道具](items.md)和[任务](tasks.md)，Redis 结构不变。
 
 ## 配置项与关键实现
 
@@ -45,3 +45,4 @@ go build ./...
 ## 变更记录
 
 - 2026-11-16：初始化 Protobuf 与 Luban 工程、示例表、生成入口与等级配置加载。
+- 2026-11-16：新增道具效果、初始道具和任务 Excel/生成数据及协议。

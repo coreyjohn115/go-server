@@ -10,4 +10,31 @@
     <var name="maxStack" type="int" />
   </bean>
   <table name="TbItem" value="Item" input="item.xlsx" index="id" group="s" />
+  <bean name="ItemRule">
+    <var name="id" type="int" />
+    <var name="mode" type="int" />
+    <var name="value" type="long" />
+    <var name="rewardItem" type="int" />
+    <var name="rewardCount" type="long" />
+  </bean>
+  <table name="TbItemRule" value="ItemRule" input="item_rule.xlsx" index="id" group="s" />
+  <bean name="InitItem">
+    <var name="id" type="int" />
+    <var name="count" type="long" />
+  </bean>
+  <table name="TbInitItem" value="InitItem" input="init_item.xlsx" index="id" group="s" />
+  <bean name="Task">
+    <var name="id" type="int" />
+    <var name="name" type="string" />
+    <var name="taskType" type="int" />
+    <var name="eventType" type="int" />
+    <var name="itemId" type="int" />
+    <var name="target" type="long" />
+    <var name="initial" type="bool" />
+    <var name="autoCommit" type="bool" />
+    <var name="nextTask" type="int" />
+    <var name="rewardItem" type="int" />
+    <var name="rewardCount" type="long" />
+  </bean>
+  <table name="TbTask" value="Task" input="task.xlsx" index="id" group="s" />
 </module>

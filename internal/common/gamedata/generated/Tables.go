@@ -13,6 +13,9 @@ type JsonLoader func(string) ([]map[string]interface{}, error)
 type Tables struct {
 	TbPlayerLevel *TbPlayerLevel
 	TbItem        *TbItem
+	TbItemRule    *TbItemRule
+	TbInitItem    *TbInitItem
+	TbTask        *TbTask
 }
 
 func NewTables(loader JsonLoader) (*Tables, error) {
@@ -30,6 +33,24 @@ func NewTables(loader JsonLoader) (*Tables, error) {
 		return nil, err
 	}
 	if tables.TbItem, err = NewTbItem(buf); err != nil {
+		return nil, err
+	}
+	if buf, err = loader("tbitemrule"); err != nil {
+		return nil, err
+	}
+	if tables.TbItemRule, err = NewTbItemRule(buf); err != nil {
+		return nil, err
+	}
+	if buf, err = loader("tbinititem"); err != nil {
+		return nil, err
+	}
+	if tables.TbInitItem, err = NewTbInitItem(buf); err != nil {
+		return nil, err
+	}
+	if buf, err = loader("tbtask"); err != nil {
+		return nil, err
+	}
+	if tables.TbTask, err = NewTbTask(buf); err != nil {
 		return nil, err
 	}
 	return tables, nil

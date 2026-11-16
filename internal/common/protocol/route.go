@@ -18,6 +18,12 @@ const (
 	// RouteAddGold 增加金币（有状态，由玩家 Actor 处理）
 	RouteAddGold int32 = 112
 
+	RouteItemList   int32 = 120
+	RouteUseItem    int32 = 121
+	RouteDeleteItem int32 = 122
+	RouteTaskList   int32 = 130
+	RouteCommitTask int32 = 131
+
 	// RouteEnterBattle 进入战斗（无状态，需已登录；battle 节点负责绑定 UID）
 	RouteEnterBattle int32 = 201
 	// RouteAttack 发起攻击（有状态：按 UID 固定到 battle 实例）

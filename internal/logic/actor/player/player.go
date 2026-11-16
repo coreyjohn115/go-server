@@ -70,10 +70,20 @@ func (a *Processor) Init() {
 	a.actor.AddRouteHandler(protocol.RoutePlayerData, a.handlePlayerData)
 	a.actor.AddRouteHandler(protocol.RouteAddExp, a.handleAddExp)
 	a.actor.AddRouteHandler(protocol.RouteAddGold, a.handleAddGold)
+	a.actor.AddRouteHandler(protocol.RouteItemList, a.handleItemList)
+	a.actor.AddRouteHandler(protocol.RouteUseItem, a.handleUseItem)
+	a.actor.AddRouteHandler(protocol.RouteDeleteItem, a.handleDeleteItem)
+	a.actor.AddRouteHandler(protocol.RouteTaskList, a.handleTaskList)
+	a.actor.AddRouteHandler(protocol.RouteCommitTask, a.handleCommitTask)
 }
 
 // Start 是 Actor 启动回调。
-func (a *Processor) Start() {}
+func (a *Processor) Start() {
+	if err := a.initializeInventory(); err != nil {
+		a.conflict = true
+		log.Errorf("initialize inventory failed, uid: %d, err: %v", a.data.UID, err)
+	}
+}
 
 // Destroy 是 Actor 销毁回调：停止延迟写库并同步落库一次。
 func (a *Processor) Destroy() {
@@ -259,5 +269,7 @@ func (a *Processor) snapshot() *protocol.Player {
 		Level:    a.data.Level,
 		Exp:      a.data.Exp,
 		Gold:     a.data.Gold,
+		Items:    a.itemSnapshot(),
+		Tasks:    a.taskSnapshot(),
 	}
 }

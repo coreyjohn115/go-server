@@ -44,5 +44,8 @@ func Load(dir string) (*Tables, error) {
 			return nil, fmt.Errorf("invalid item %d", row.Id)
 		}
 	}
+	if err := validateInventory(tables); err != nil {
+		return nil, err
+	}
 	return tables, nil
 }

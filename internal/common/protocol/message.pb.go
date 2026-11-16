@@ -21,6 +21,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type TaskStatus int32
+
+const (
+	TaskStatus_TASK_STATUS_UNSPECIFIED TaskStatus = 0
+	TaskStatus_TASK_STATUS_ACCEPTED    TaskStatus = 1
+	TaskStatus_TASK_STATUS_FINISHED    TaskStatus = 2
+	TaskStatus_TASK_STATUS_COMMITTED   TaskStatus = 3
+)
+
+// Enum value maps for TaskStatus.
+var (
+	TaskStatus_name = map[int32]string{
+		0: "TASK_STATUS_UNSPECIFIED",
+		1: "TASK_STATUS_ACCEPTED",
+		2: "TASK_STATUS_FINISHED",
+		3: "TASK_STATUS_COMMITTED",
+	}
+	TaskStatus_value = map[string]int32{
+		"TASK_STATUS_UNSPECIFIED": 0,
+		"TASK_STATUS_ACCEPTED":    1,
+		"TASK_STATUS_FINISHED":    2,
+		"TASK_STATUS_COMMITTED":   3,
+	}
+)
+
+func (x TaskStatus) Enum() *TaskStatus {
+	p := new(TaskStatus)
+	*p = x
+	return p
+}
+
+func (x TaskStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TaskStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_message_proto_enumTypes[0].Descriptor()
+}
+
+func (TaskStatus) Type() protoreflect.EnumType {
+	return &file_message_proto_enumTypes[0]
+}
+
+func (x TaskStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TaskStatus.Descriptor instead.
+func (TaskStatus) EnumDescriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{0}
+}
+
 type Player struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UID           int64                  `protobuf:"varint,1,opt,name=UID,json=uid,proto3" json:"UID,omitempty"`
@@ -28,6 +80,8 @@ type Player struct {
 	Level         int32                  `protobuf:"varint,3,opt,name=level,proto3" json:"level,omitempty"`
 	Exp           int64                  `protobuf:"varint,4,opt,name=exp,proto3" json:"exp,omitempty"`
 	Gold          int64                  `protobuf:"varint,5,opt,name=gold,proto3" json:"gold,omitempty"`
+	Items         []*ItemStack           `protobuf:"bytes,6,rep,name=items,proto3" json:"items,omitempty"`
+	Tasks         []*TaskState           `protobuf:"bytes,7,rep,name=tasks,proto3" json:"tasks,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -95,6 +149,20 @@ func (x *Player) GetGold() int64 {
 		return x.Gold
 	}
 	return 0
+}
+
+func (x *Player) GetItems() []*ItemStack {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *Player) GetTasks() []*TaskState {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
 }
 
 type LoginReq struct {
@@ -1053,17 +1121,608 @@ func (x *ErrorRes) GetMessage() string {
 	return ""
 }
 
+type ItemStack struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ConfigId      int32                  `protobuf:"varint,2,opt,name=config_id,json=configId,proto3" json:"config_id,omitempty"`
+	Count         int64                  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemStack) Reset() {
+	*x = ItemStack{}
+	mi := &file_message_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemStack) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemStack) ProtoMessage() {}
+
+func (x *ItemStack) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemStack.ProtoReflect.Descriptor instead.
+func (*ItemStack) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ItemStack) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *ItemStack) GetConfigId() int32 {
+	if x != nil {
+		return x.ConfigId
+	}
+	return 0
+}
+
+func (x *ItemStack) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type TaskState struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Progress      int64                  `protobuf:"varint,2,opt,name=progress,proto3" json:"progress,omitempty"`
+	Target        int64                  `protobuf:"varint,3,opt,name=target,proto3" json:"target,omitempty"`
+	Status        TaskStatus             `protobuf:"varint,4,opt,name=status,proto3,enum=due.protocol.TaskStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TaskState) Reset() {
+	*x = TaskState{}
+	mi := &file_message_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskState) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskState) ProtoMessage() {}
+
+func (x *TaskState) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskState.ProtoReflect.Descriptor instead.
+func (*TaskState) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *TaskState) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *TaskState) GetProgress() int64 {
+	if x != nil {
+		return x.Progress
+	}
+	return 0
+}
+
+func (x *TaskState) GetTarget() int64 {
+	if x != nil {
+		return x.Target
+	}
+	return 0
+}
+
+func (x *TaskState) GetStatus() TaskStatus {
+	if x != nil {
+		return x.Status
+	}
+	return TaskStatus_TASK_STATUS_UNSPECIFIED
+}
+
+type ItemListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemListReq) Reset() {
+	*x = ItemListReq{}
+	mi := &file_message_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemListReq) ProtoMessage() {}
+
+func (x *ItemListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemListReq.ProtoReflect.Descriptor instead.
+func (*ItemListReq) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{20}
+}
+
+type ItemListRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Items         []*ItemStack           `protobuf:"bytes,3,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemListRes) Reset() {
+	*x = ItemListRes{}
+	mi := &file_message_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemListRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemListRes) ProtoMessage() {}
+
+func (x *ItemListRes) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemListRes.ProtoReflect.Descriptor instead.
+func (*ItemListRes) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ItemListRes) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ItemListRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ItemListRes) GetItems() []*ItemStack {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type UseItemReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Count         int64                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UseItemReq) Reset() {
+	*x = UseItemReq{}
+	mi := &file_message_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UseItemReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UseItemReq) ProtoMessage() {}
+
+func (x *UseItemReq) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UseItemReq.ProtoReflect.Descriptor instead.
+func (*UseItemReq) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *UseItemReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UseItemReq) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type DeleteItemReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Count         int64                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteItemReq) Reset() {
+	*x = DeleteItemReq{}
+	mi := &file_message_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteItemReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteItemReq) ProtoMessage() {}
+
+func (x *DeleteItemReq) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteItemReq.ProtoReflect.Descriptor instead.
+func (*DeleteItemReq) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *DeleteItemReq) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *DeleteItemReq) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+// Asset mutations return a complete snapshot, including removed stacks and task changes.
+type ItemChangeRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Player        *Player                `protobuf:"bytes,3,opt,name=player,proto3" json:"player,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemChangeRes) Reset() {
+	*x = ItemChangeRes{}
+	mi := &file_message_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemChangeRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemChangeRes) ProtoMessage() {}
+
+func (x *ItemChangeRes) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemChangeRes.ProtoReflect.Descriptor instead.
+func (*ItemChangeRes) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ItemChangeRes) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ItemChangeRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ItemChangeRes) GetPlayer() *Player {
+	if x != nil {
+		return x.Player
+	}
+	return nil
+}
+
+type TaskListReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TaskListReq) Reset() {
+	*x = TaskListReq{}
+	mi := &file_message_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskListReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskListReq) ProtoMessage() {}
+
+func (x *TaskListReq) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskListReq.ProtoReflect.Descriptor instead.
+func (*TaskListReq) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{25}
+}
+
+type TaskListRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Tasks         []*TaskState           `protobuf:"bytes,3,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TaskListRes) Reset() {
+	*x = TaskListRes{}
+	mi := &file_message_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskListRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskListRes) ProtoMessage() {}
+
+func (x *TaskListRes) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskListRes.ProtoReflect.Descriptor instead.
+func (*TaskListRes) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *TaskListRes) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *TaskListRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *TaskListRes) GetTasks() []*TaskState {
+	if x != nil {
+		return x.Tasks
+	}
+	return nil
+}
+
+type CommitTaskReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommitTaskReq) Reset() {
+	*x = CommitTaskReq{}
+	mi := &file_message_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommitTaskReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommitTaskReq) ProtoMessage() {}
+
+func (x *CommitTaskReq) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommitTaskReq.ProtoReflect.Descriptor instead.
+func (*CommitTaskReq) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *CommitTaskReq) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type CommitTaskRes struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Player        *Player                `protobuf:"bytes,3,opt,name=player,proto3" json:"player,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommitTaskRes) Reset() {
+	*x = CommitTaskRes{}
+	mi := &file_message_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommitTaskRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommitTaskRes) ProtoMessage() {}
+
+func (x *CommitTaskRes) ProtoReflect() protoreflect.Message {
+	mi := &file_message_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommitTaskRes.ProtoReflect.Descriptor instead.
+func (*CommitTaskRes) Descriptor() ([]byte, []int) {
+	return file_message_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *CommitTaskRes) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *CommitTaskRes) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CommitTaskRes) GetPlayer() *Player {
+	if x != nil {
+		return x.Player
+	}
+	return nil
+}
+
 var File_message_proto protoreflect.FileDescriptor
 
 const file_message_proto_rawDesc = "" +
 	"\n" +
-	"\rmessage.proto\x12\fdue.protocol\"r\n" +
+	"\rmessage.proto\x12\fdue.protocol\"\xd0\x01\n" +
 	"\x06Player\x12\x10\n" +
 	"\x03UID\x18\x01 \x01(\x03R\x03uid\x12\x1a\n" +
 	"\bnickname\x18\x02 \x01(\tR\bnickname\x12\x14\n" +
 	"\x05level\x18\x03 \x01(\x05R\x05level\x12\x10\n" +
 	"\x03exp\x18\x04 \x01(\x03R\x03exp\x12\x12\n" +
-	"\x04gold\x18\x05 \x01(\x03R\x04gold\"2\n" +
+	"\x04gold\x18\x05 \x01(\x03R\x04gold\x12-\n" +
+	"\x05items\x18\x06 \x03(\v2\x17.due.protocol.ItemStackR\x05items\x12-\n" +
+	"\x05tasks\x18\a \x03(\v2\x17.due.protocol.TaskStateR\x05tasks\"2\n" +
 	"\bLoginReq\x12\x10\n" +
 	"\x03UID\x18\x01 \x01(\x03R\x03uid\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\"z\n" +
@@ -1126,7 +1785,49 @@ const file_message_proto_rawDesc = "" +
 	"\x04node\x18\x04 \x01(\tR\x04node\"8\n" +
 	"\bErrorRes\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB.Z,due-server/internal/common/protocol;protocolb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessage\"N\n" +
+	"\tItemStack\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\tconfig_id\x18\x02 \x01(\x05R\bconfigId\x12\x14\n" +
+	"\x05count\x18\x03 \x01(\x03R\x05count\"\x81\x01\n" +
+	"\tTaskState\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1a\n" +
+	"\bprogress\x18\x02 \x01(\x03R\bprogress\x12\x16\n" +
+	"\x06target\x18\x03 \x01(\x03R\x06target\x120\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x18.due.protocol.TaskStatusR\x06status\"\r\n" +
+	"\vItemListReq\"j\n" +
+	"\vItemListRes\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12-\n" +
+	"\x05items\x18\x03 \x03(\v2\x17.due.protocol.ItemStackR\x05items\"2\n" +
+	"\n" +
+	"UseItemReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x03R\x05count\"5\n" +
+	"\rDeleteItemReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x03R\x05count\"k\n" +
+	"\rItemChangeRes\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x06player\x18\x03 \x01(\v2\x14.due.protocol.PlayerR\x06player\"\r\n" +
+	"\vTaskListReq\"j\n" +
+	"\vTaskListRes\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12-\n" +
+	"\x05tasks\x18\x03 \x03(\v2\x17.due.protocol.TaskStateR\x05tasks\"\x1f\n" +
+	"\rCommitTaskReq\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"k\n" +
+	"\rCommitTaskRes\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12,\n" +
+	"\x06player\x18\x03 \x01(\v2\x14.due.protocol.PlayerR\x06player*x\n" +
+	"\n" +
+	"TaskStatus\x12\x1b\n" +
+	"\x17TASK_STATUS_UNSPECIFIED\x10\x00\x12\x18\n" +
+	"\x14TASK_STATUS_ACCEPTED\x10\x01\x12\x18\n" +
+	"\x14TASK_STATUS_FINISHED\x10\x02\x12\x19\n" +
+	"\x15TASK_STATUS_COMMITTED\x10\x03B.Z,due-server/internal/common/protocol;protocolb\x06proto3"
 
 var (
 	file_message_proto_rawDescOnce sync.Once
@@ -1140,37 +1841,57 @@ func file_message_proto_rawDescGZIP() []byte {
 	return file_message_proto_rawDescData
 }
 
-var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_message_proto_goTypes = []any{
-	(*Player)(nil),         // 0: due.protocol.Player
-	(*LoginReq)(nil),       // 1: due.protocol.LoginReq
-	(*LoginRes)(nil),       // 2: due.protocol.LoginRes
-	(*PingReq)(nil),        // 3: due.protocol.PingReq
-	(*PingRes)(nil),        // 4: due.protocol.PingRes
-	(*PlayerDataReq)(nil),  // 5: due.protocol.PlayerDataReq
-	(*PlayerDataRes)(nil),  // 6: due.protocol.PlayerDataRes
-	(*AddExpReq)(nil),      // 7: due.protocol.AddExpReq
-	(*AddExpRes)(nil),      // 8: due.protocol.AddExpRes
-	(*AddGoldReq)(nil),     // 9: due.protocol.AddGoldReq
-	(*AddGoldRes)(nil),     // 10: due.protocol.AddGoldRes
-	(*EnterBattleReq)(nil), // 11: due.protocol.EnterBattleReq
-	(*EnterBattleRes)(nil), // 12: due.protocol.EnterBattleRes
-	(*AttackReq)(nil),      // 13: due.protocol.AttackReq
-	(*AttackRes)(nil),      // 14: due.protocol.AttackRes
-	(*LeaveBattleReq)(nil), // 15: due.protocol.LeaveBattleReq
-	(*LeaveBattleRes)(nil), // 16: due.protocol.LeaveBattleRes
-	(*ErrorRes)(nil),       // 17: due.protocol.ErrorRes
+	(TaskStatus)(0),        // 0: due.protocol.TaskStatus
+	(*Player)(nil),         // 1: due.protocol.Player
+	(*LoginReq)(nil),       // 2: due.protocol.LoginReq
+	(*LoginRes)(nil),       // 3: due.protocol.LoginRes
+	(*PingReq)(nil),        // 4: due.protocol.PingReq
+	(*PingRes)(nil),        // 5: due.protocol.PingRes
+	(*PlayerDataReq)(nil),  // 6: due.protocol.PlayerDataReq
+	(*PlayerDataRes)(nil),  // 7: due.protocol.PlayerDataRes
+	(*AddExpReq)(nil),      // 8: due.protocol.AddExpReq
+	(*AddExpRes)(nil),      // 9: due.protocol.AddExpRes
+	(*AddGoldReq)(nil),     // 10: due.protocol.AddGoldReq
+	(*AddGoldRes)(nil),     // 11: due.protocol.AddGoldRes
+	(*EnterBattleReq)(nil), // 12: due.protocol.EnterBattleReq
+	(*EnterBattleRes)(nil), // 13: due.protocol.EnterBattleRes
+	(*AttackReq)(nil),      // 14: due.protocol.AttackReq
+	(*AttackRes)(nil),      // 15: due.protocol.AttackRes
+	(*LeaveBattleReq)(nil), // 16: due.protocol.LeaveBattleReq
+	(*LeaveBattleRes)(nil), // 17: due.protocol.LeaveBattleRes
+	(*ErrorRes)(nil),       // 18: due.protocol.ErrorRes
+	(*ItemStack)(nil),      // 19: due.protocol.ItemStack
+	(*TaskState)(nil),      // 20: due.protocol.TaskState
+	(*ItemListReq)(nil),    // 21: due.protocol.ItemListReq
+	(*ItemListRes)(nil),    // 22: due.protocol.ItemListRes
+	(*UseItemReq)(nil),     // 23: due.protocol.UseItemReq
+	(*DeleteItemReq)(nil),  // 24: due.protocol.DeleteItemReq
+	(*ItemChangeRes)(nil),  // 25: due.protocol.ItemChangeRes
+	(*TaskListReq)(nil),    // 26: due.protocol.TaskListReq
+	(*TaskListRes)(nil),    // 27: due.protocol.TaskListRes
+	(*CommitTaskReq)(nil),  // 28: due.protocol.CommitTaskReq
+	(*CommitTaskRes)(nil),  // 29: due.protocol.CommitTaskRes
 }
 var file_message_proto_depIdxs = []int32{
-	0, // 0: due.protocol.LoginRes.player:type_name -> due.protocol.Player
-	0, // 1: due.protocol.PlayerDataRes.player:type_name -> due.protocol.Player
-	0, // 2: due.protocol.AddExpRes.player:type_name -> due.protocol.Player
-	0, // 3: due.protocol.AddGoldRes.player:type_name -> due.protocol.Player
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	19, // 0: due.protocol.Player.items:type_name -> due.protocol.ItemStack
+	20, // 1: due.protocol.Player.tasks:type_name -> due.protocol.TaskState
+	1,  // 2: due.protocol.LoginRes.player:type_name -> due.protocol.Player
+	1,  // 3: due.protocol.PlayerDataRes.player:type_name -> due.protocol.Player
+	1,  // 4: due.protocol.AddExpRes.player:type_name -> due.protocol.Player
+	1,  // 5: due.protocol.AddGoldRes.player:type_name -> due.protocol.Player
+	0,  // 6: due.protocol.TaskState.status:type_name -> due.protocol.TaskStatus
+	19, // 7: due.protocol.ItemListRes.items:type_name -> due.protocol.ItemStack
+	1,  // 8: due.protocol.ItemChangeRes.player:type_name -> due.protocol.Player
+	20, // 9: due.protocol.TaskListRes.tasks:type_name -> due.protocol.TaskState
+	1,  // 10: due.protocol.CommitTaskRes.player:type_name -> due.protocol.Player
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_message_proto_init() }
@@ -1183,13 +1904,14 @@ func file_message_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_message_proto_rawDesc), len(file_message_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   18,
+			NumEnums:      1,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_message_proto_goTypes,
 		DependencyIndexes: file_message_proto_depIdxs,
+		EnumInfos:         file_message_proto_enumTypes,
 		MessageInfos:      file_message_proto_msgTypes,
 	}.Build()
 	File_message_proto = out.File

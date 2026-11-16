@@ -95,6 +95,11 @@ func (h *Logic) NextToActor(ctx node.Context) {
 | 110 | playerData | logic | 有状态 + Actor | 查询玩家数据 |
 | 111 | addExp | logic | 有状态 + Actor | 加经验，自动升级 |
 | 112 | addGold | logic | 有状态 + Actor | 加金币 |
+| 120 | itemList | logic | 有状态 + Actor | 背包列表 |
+| 121 | useItem | logic | 有状态 + Actor | 使用道具 |
+| 122 | deleteItem | logic | 有状态 + Actor | 删除道具 |
+| 130 | taskList | logic | 有状态 + Actor | 任务列表 |
+| 131 | commitTask | logic | 有状态 + Actor | 提交任务领取奖励 |
 | 201 | enterBattle | battle | 无状态 + 需登录 | 绑定 UID 到 battle，创建房间 |
 | 202 | attack | battle | 有状态 | 攻击，房间状态只在本实例 |
 | 203 | leaveBattle | battle | 有状态 | 清理房间并解除 battle 绑定 |
@@ -172,6 +177,7 @@ due/
 ## 功能文档
 
 - 文档索引与规范：[doc/README.md](doc/README.md)
+- [道具与背包](doc/features/items.md)、[玩家任务](doc/features/tasks.md)：参考 Game101 的初始化、道具事件和任务提交机制，通过 Luban 配置，在玩家 Actor 内处理并持久化。
 - 新增或修改功能时，必须在 `doc/features/<feature>.md` 新增/更新功能文档，并更新索引；
 - 具体规则与完成前检查清单见项目 skill [feature-docs](.agents/skills/feature-docs/SKILL.md)；
 - 新功能从 `doc/features/_template.md` 复制开始。

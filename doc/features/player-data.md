@@ -9,7 +9,7 @@
 玩家登录时从 MongoDB 加载数据（不存在则创建），在线期间的数据变更由每个玩家独立的
 Actor 串行处理，变更合并后落库；玩家下线或 Actor 销毁时同步落库。
 
-当前字段：昵称、等级、经验、金币。
+当前字段：昵称、等级、经验、金币，以及[背包](items.md)和[任务](tasks.md)。登录/查询/资产变更快照包含完整 `items`、`tasks`。
 
 ## 2. 路由与接口
 
@@ -65,6 +65,10 @@ MongoDB 集合 `due.players`，以 UID 作为 `_id`：
 | `level` | int32 | 等级，初始 1 |
 | `exp` | int64 | 当前经验 |
 | `gold` | int64 | 金币 |
+| `items` | array | 堆栈 id/configId/count |
+| `tasks` | array | 任务 id/progress/status，已提交记录保留 |
+| `initItemIds` | array | 已发放初始道具的配置 ID |
+| `nextItemId` | int64 | 玩家内最近分配的堆栈 ID |
 | `version` | int64 | 每次变更自增，保存时检查上次成功写入版本 |
 | `createdAt` | datetime | 创建时间 |
 | `updatedAt` | datetime | 最近更新时间 |
@@ -128,3 +132,4 @@ add gold +100: uid=1001 nickname=player-1001 level=1 exp=50 gold=100
 | 2026-11-15 | 初版：玩家数据落 MongoDB，玩家内部功能改为 Actor 处理 |
 | 2026-11-16 | 补充功能文档 |
 | 2026-11-16 | TCP 协议迁移至 Protobuf，等级经验接入 Luban 表；同步版本保存与配置键说明 |
+| 2026-11-16 | 同文档增加背包、任务及初始化标记，旧玩家上线补齐，快照追加 items/tasks |

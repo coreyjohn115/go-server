@@ -19,14 +19,30 @@ var ErrVersionConflict = errors.New("player version conflict")
 
 // Player 是玩家数据文档。
 type Player struct {
-	UID       int64     `bson:"_id"`
-	Nickname  string    `bson:"nickname"`
-	Level     int32     `bson:"level"`
-	Exp       int64     `bson:"exp"`
-	Gold      int64     `bson:"gold"`
-	Version   int64     `bson:"version"`
-	CreatedAt time.Time `bson:"createdAt"`
-	UpdatedAt time.Time `bson:"updatedAt"`
+	UID         int64     `bson:"_id"`
+	Nickname    string    `bson:"nickname"`
+	Level       int32     `bson:"level"`
+	Exp         int64     `bson:"exp"`
+	Gold        int64     `bson:"gold"`
+	Items       []Item    `bson:"items"`
+	Tasks       []Task    `bson:"tasks"`
+	InitItemIDs []int32   `bson:"initItemIds"`
+	NextItemID  int64     `bson:"nextItemId"`
+	Version     int64     `bson:"version"`
+	CreatedAt   time.Time `bson:"createdAt"`
+	UpdatedAt   time.Time `bson:"updatedAt"`
+}
+
+type Item struct {
+	ID       int64 `bson:"id"`
+	ConfigID int32 `bson:"configId"`
+	Count    int64 `bson:"count"`
+}
+
+type Task struct {
+	ID       int32 `bson:"id"`
+	Progress int64 `bson:"progress"`
+	Status   int32 `bson:"status"`
 }
 
 // Store 是玩家数据存储。
@@ -102,12 +118,16 @@ func (s *Store) LoadOrCreate(ctx context.Context, uid int64, nickname string) (*
 func (s *Store) Save(ctx context.Context, player *Player, expectedVersion int64) error {
 	result, err := s.coll.UpdateOne(ctx, bson.M{"_id": player.UID, "version": expectedVersion}, bson.M{
 		"$set": bson.M{
-			"nickname":  player.Nickname,
-			"level":     player.Level,
-			"exp":       player.Exp,
-			"gold":      player.Gold,
-			"version":   player.Version,
-			"updatedAt": player.UpdatedAt,
+			"nickname":    player.Nickname,
+			"level":       player.Level,
+			"exp":         player.Exp,
+			"gold":        player.Gold,
+			"items":       player.Items,
+			"tasks":       player.Tasks,
+			"initItemIds": player.InitItemIDs,
+			"nextItemId":  player.NextItemID,
+			"version":     player.Version,
+			"updatedAt":   player.UpdatedAt,
 		},
 	})
 

@@ -64,6 +64,8 @@ func initListeners(proxy *client.Proxy, d *demo) {
 	proxy.AddRouteHandler(protocol.RoutePlayerData, d.onPlayerData)
 	proxy.AddRouteHandler(protocol.RouteAddExp, d.onAddExp)
 	proxy.AddRouteHandler(protocol.RouteAddGold, d.onAddGold)
+	proxy.AddRouteHandler(protocol.RouteItemList, d.onItemList)
+	proxy.AddRouteHandler(protocol.RouteTaskList, d.onTaskList)
 	proxy.AddRouteHandler(protocol.RouteEnterBattle, d.onEnterBattle)
 	proxy.AddRouteHandler(protocol.RouteAttack, d.onAttack)
 	proxy.AddRouteHandler(protocol.RouteLeaveBattle, d.onLeaveBattle)
@@ -123,6 +125,26 @@ func (d *demo) onPlayerData(ctx *client.Context) {
 	}
 
 	// 加经验、加金币之后再次进入战斗流程
+	push(ctx.Conn(), protocol.RouteItemList, &protocol.ItemListReq{})
+}
+
+func (d *demo) onItemList(ctx *client.Context) {
+	res := &protocol.ItemListRes{}
+	if err := ctx.Parse(res); err != nil || res.Code != int32(codes.OK.Code()) {
+		log.Errorf("item list failed: %v, %v", err, res)
+		return
+	}
+	log.Infof("inventory: %v", res.Items)
+	push(ctx.Conn(), protocol.RouteTaskList, &protocol.TaskListReq{})
+}
+
+func (d *demo) onTaskList(ctx *client.Context) {
+	res := &protocol.TaskListRes{}
+	if err := ctx.Parse(res); err != nil || res.Code != int32(codes.OK.Code()) {
+		log.Errorf("task list failed: %v, %v", err, res)
+		return
+	}
+	log.Infof("tasks: %v", res.Tasks)
 	push(ctx.Conn(), protocol.RouteEnterBattle, &protocol.EnterBattleReq{Mode: "1v1"})
 }
 

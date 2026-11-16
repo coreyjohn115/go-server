@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1001,
+    "mode": 1,
+    "value": 1,
+    "rewardItem": 0,
+    "rewardCount": 0
+  },
+  {
+    "id": 1002,
+    "mode": 2,
+    "value": 50,
+    "rewardItem": 0,
+    "rewardCount": 0
+  },
+  {
+    "id": 1003,
+    "mode": 4,
+    "value": 0,
+    "rewardItem": 1002,
+    "rewardCount": 2
+  },
+  {
+    "id": 120001,
+    "mode": 3,
+    "value": 0,
+    "rewardItem": 0,
+    "rewardCount": 0
+  }
+]

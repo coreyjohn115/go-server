@@ -15,6 +15,8 @@
 | 功能 | 文档 | 涉及进程 | 状态 |
 | --- | --- | --- | --- |
 | 玩家数据（MongoDB + Actor） | [features/player-data.md](features/player-data.md) | logic | 已实现 |
+| 道具与背包 | [features/items.md](features/items.md) | logic/client | 已实现 |
+| 玩家任务 | [features/tasks.md](features/tasks.md) | logic/client | 已实现 |
 | Protobuf 与 Luban 生成 | [features/code-generation.md](features/code-generation.md) | logic/battle/client/robot | 已实现 |
 
 ## 如何新增功能文档

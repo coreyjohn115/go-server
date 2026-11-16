@@ -1,0 +1,67 @@
+[
+  {
+    "id": 110001,
+    "name": "使用经验药水",
+    "taskType": 11,
+    "eventType": 2,
+    "itemId": 1002,
+    "target": 1,
+    "initial": true,
+    "autoCommit": false,
+    "nextTask": 110002,
+    "rewardItem": 1001,
+    "rewardCount": 100
+  },
+  {
+    "id": 110002,
+    "name": "使用三瓶经验药水",
+    "taskType": 11,
+    "eventType": 2,
+    "itemId": 1002,
+    "target": 3,
+    "initial": false,
+    "autoCommit": false,
+    "nextTask": 0,
+    "rewardItem": 1003,
+    "rewardCount": 1
+  },
+  {
+    "id": 100001,
+    "name": "获得五个道具",
+    "taskType": 10,
+    "eventType": 3,
+    "itemId": 0,
+    "target": 5,
+    "initial": true,
+    "autoCommit": false,
+    "nextTask": 0,
+    "rewardItem": 1002,
+    "rewardCount": 2
+  },
+  {
+    "id": 100002,
+    "name": "消耗三个道具",
+    "taskType": 10,
+    "eventType": 4,
+    "itemId": 0,
+    "target": 3,
+    "initial": true,
+    "autoCommit": false,
+    "nextTask": 0,
+    "rewardItem": 1001,
+    "rewardCount": 50
+  },
+  {
+    "id": 100003,
+    "name": "欢迎奖励",
+    "taskType": 10,
+    "eventType": 1,
+    "itemId": 0,
+    "target": 1,
+    "initial": true,
+    "autoCommit": false,
+    "nextTask": 0,
+    "rewardItem": 1002,
+    "rewardCount": 1
+  }
+]
